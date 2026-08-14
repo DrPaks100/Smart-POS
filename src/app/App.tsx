@@ -28,6 +28,8 @@ const queryClient = new QueryClient({
   },
 })
 
+const routerBasename = import.meta.env.BASE_URL.replace(/\/$/, '') || undefined
+
 export function App() {
   const init = useAuthStore((s) => s.init)
   const themeId = useThemeStore((s) => s.themeId)
@@ -43,7 +45,7 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={routerBasename}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

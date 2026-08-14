@@ -71,7 +71,7 @@ export function downloadSalesCsv(sales: Sale[]) {
 export async function downloadSalesSpreadsheet(sales: Sale[]) {
   let logo = ''
   try {
-    const res = await fetch('/best-brightness-logo.png')
+    const res = await fetch(`${import.meta.env.BASE_URL}best-brightness-logo.png`)
     const blob = await res.blob()
     logo = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader()
