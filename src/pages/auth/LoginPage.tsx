@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Lock, Mail } from 'lucide-react'
+import { Lock, Mail, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { LoginSketchBackground } from '@/components/auth/LoginSketchBackground'
+import { DEMO_ACCOUNTS } from '@/constants'
 import { useAuthStore } from '@/stores/authStore'
 import { authErrorMessage, cn } from '@/utils'
+import type { UserRole } from '@/types'
 
 const BLEND =
   'linear-gradient(135deg, #84cc16 0%, #0d9488 35%, #2563eb 70%, #7c3aed 100%)'
@@ -19,25 +21,39 @@ export function LoginPage() {
   const navigate = useNavigate()
   const profile = useAuthStore((s) => s.profile)
   const { login, loading, error, clearError, user, initialized } = useAuthStore()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const adminDemo = DEMO_ACCOUNTS[0]!
+  const [email, setEmail] = useState<string>(adminDemo.email)
+  const [password, setPassword] = useState<string>(adminDemo.password)
   const [emailFocus, setEmailFocus] = useState(false)
   const [passwordFocus, setPasswordFocus] = useState(false)
+  const [demoRole, setDemoRole] = useState<UserRole | 'open' | null>(null)
 
   if (initialized && user) {
     return <Navigate to={profile?.role === 'cashier' ? '/pos' : '/dashboard'} replace />
   }
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault()
+  function goAfterLogin(role?: string) {
+    navigate(role === 'cashier' ? '/pos' : '/dashboard')
+  }
+
+  async function signInWith(nextEmail: string, nextPassword: string, tag: UserRole | 'open') {
     clearError()
+    setEmail(nextEmail)
+    setPassword(nextPassword)
+    setDemoRole(tag)
     try {
-      await login(email.trim(), password)
-      const role = useAuthStore.getState().profile?.role
-      navigate(role === 'cashier' ? '/pos' : '/dashboard')
+      await login(nextEmail.trim(), nextPassword)
+      goAfterLogin(useAuthStore.getState().profile?.role)
     } catch {
       /* stored */
+    } finally {
+      setDemoRole(null)
     }
+  }
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault()
+    await signInWith(email, password, 'open')
   }
 
   return (
@@ -65,7 +81,7 @@ export function LoginPage() {
         initial={{ opacity: 0, y: 28, scale: 0.94 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 24 }}
-        className="relative z-10 w-full max-w-[400px]"
+        className="relative z-10 w-full max-w-[420px]"
       >
         <div className="mb-5 text-center">
           <motion.div
@@ -88,7 +104,7 @@ export function LoginPage() {
             transition={{ delay: 0.22 }}
             className="text-[14px] font-medium text-[var(--bb-muted)]"
           >
-            Welcome back to your shop
+            Live shop demo — tap a role and walk the floor
           </motion.p>
         </div>
 
@@ -112,6 +128,52 @@ export function LoginPage() {
             animate={{ scale: [1, 1.2, 1], opacity: [0.28, 0.42, 0.28] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
           />
+
+          <div className="relative mb-4 rounded-2xl bg-[var(--bb-blend-soft)] px-3 py-3">
+            <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--bb-muted)]">
+              <Sparkles className="h-3 w-3" />
+              Portfolio demo
+            </p>
+            <p className="mt-1 text-[12px] font-medium leading-snug text-[var(--bb-ink)]">
+              Open the till as Admin, Manager, or Cashier. Logins are public on purpose.
+            </p>
+            <div className="mt-2.5 grid grid-cols-3 gap-1.5">
+              {DEMO_ACCOUNTS.map((account) => (
+                <button
+                  key={account.role}
+                  type="button"
+                  disabled={loading}
+                  onClick={() => void signInWith(account.email, account.password, account.role)}
+                  className={cn(
+                    'rounded-xl px-1.5 py-2 text-center ring-1 transition',
+                    demoRole === account.role
+                      ? 'bb-blend-bg text-white ring-transparent'
+                      : 'bg-white/90 text-[var(--bb-ink)] ring-[var(--bb-border)] hover:ring-[var(--bb-blue)]/40',
+                  )}
+                >
+                  <p className="text-[12px] font-extrabold">{account.label}</p>
+                  <p
+                    className={cn(
+                      'mt-0.5 text-[9px] font-semibold leading-tight',
+                      demoRole === account.role ? 'text-white/80' : 'text-[var(--bb-muted)]',
+                    )}
+                  >
+                    {account.hint}
+                  </p>
+                </button>
+              ))}
+            </div>
+            <div className="mt-2 space-y-1 rounded-xl bg-white/70 px-2.5 py-2">
+              {DEMO_ACCOUNTS.map((account) => (
+                <p key={account.email} className="truncate text-[10px] font-semibold text-[var(--bb-muted)]">
+                  <span className="font-extrabold text-[var(--bb-ink)]">{account.label}:</span>{' '}
+                  {account.email}
+                  <span className="mx-1 text-[var(--bb-border)]">·</span>
+                  {account.password}
+                </p>
+              ))}
+            </div>
+          </div>
 
           <div className="relative space-y-3.5">
             <label className="flex flex-col gap-1.5">
@@ -198,7 +260,7 @@ export function LoginPage() {
                 color: '#ffffff',
               }}
             >
-              Sign in
+              Open the shop
             </Button>
           </motion.div>
 
@@ -218,7 +280,7 @@ export function LoginPage() {
           transition={{ delay: 0.5 }}
           className="mt-5 text-center text-[11px] font-medium text-[var(--bb-muted)]"
         >
-          Secure retail access · Best Brightness Smart POS
+          Portfolio demo · Best Brightness Smart POS
         </motion.p>
       </motion.div>
     </div>

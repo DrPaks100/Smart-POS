@@ -22,6 +22,16 @@ React · TypeScript · Vite · Firebase (Auth, Firestore) · Tailwind · Zustand
 
 Staff (managers and cashiers) are registered by an administrator under **Staff**.
 
+## Demo logins
+
+This is a live portfolio demo. Visitors can tap a role on the login page or sign in with:
+
+| Role | Email | Password |
+|------|--------|----------|
+| Admin | `admin@bestbrightness.co.za` | `BestBright@Admin2026!` |
+| Manager | `manager@bestbrightness.co.za` | `DemoTill@2026` |
+| Cashier | `cashier@bestbrightness.co.za` | `DemoTill@2026` |
+
 ## Local development
 
 ```bash

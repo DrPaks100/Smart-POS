@@ -8,6 +8,34 @@ export const ROLE_LABELS = {
   cashier: 'Cashier',
 } as const
 
+/** Public portfolio demo logins — shown on the sign-in page. */
+export const DEMO_ACCOUNTS = [
+  {
+    role: 'admin' as const,
+    label: 'Admin',
+    hint: 'Full shop · staff & settings',
+    email: 'admin@bestbrightness.co.za',
+    password: 'BestBright@Admin2026!',
+    displayName: 'Best Brightness Admin',
+  },
+  {
+    role: 'manager' as const,
+    label: 'Manager',
+    hint: 'Floor · stock & reports',
+    email: 'manager@bestbrightness.co.za',
+    password: 'DemoTill@2026',
+    displayName: 'Sipho Manager',
+  },
+  {
+    role: 'cashier' as const,
+    label: 'Cashier',
+    hint: 'Till · scan & sell',
+    email: 'cashier@bestbrightness.co.za',
+    password: 'DemoTill@2026',
+    displayName: 'Lerato Cashier',
+  },
+] as const
+
 export const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', roles: ['admin', 'manager', 'cashier'] },
   { to: '/pos', label: 'Point of Sale', roles: ['admin', 'manager', 'cashier'] },
