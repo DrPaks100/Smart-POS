@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(roles) {
+      return signedIn() && userExists() && userDoc().role in roles;
+    }
+
+    // Signed-in staff can work even before users/{uid} exists (bootstrap).
+    function canManageCatalogue() {
+      return signedIn() && (hasRole(['admin', 'manager']) || !userExists());
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || hasRole(['admin', 'manager']));
+      allow create: if signedIn() && (
+        (
+          request.auth.uid == userId
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.role in ['admin', 'manager', 'cashier']
+        )
+        || (
+          hasRole(['admin'])
+          && request.resource.data.uid == userId
+          && request.resource.data.role in ['manager', 'cashier']
+        )
+      );
+      allow update: if hasRole(['admin'])
+        || (signedIn()
+          && request.auth.uid == userId
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.isActive == resource.data.isActive);
+      allow delete: if hasRole(['admin']);
+    }
+
+    match /products/{id} {
+      allow read: if signedIn();
+      allow create, delete: if canManageCatalogue();
+      allow update: if canManageCatalogue()
+        || (signedIn()
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['stockQuantity', 'updatedAt'])
+          && request.resource.data.stockQuantity is number);
+    }
+
+    match /categories/{id} {
+      allow read: if signedIn();
+      allow write: if canManageCatalogue();
+    }
+
+    match /sales/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update, delete: if hasRole(['admin', 'manager']) || (signedIn() && !userExists());
+    }
+
+    match /customers/{id} {
+      allow read, write: if signedIn();
+    }
+
+    match /suppliers/{id} {
+      allow read: if signedIn();
+      allow write: if canManageCatalogue();
+    }
+
+    match /inventory_logs/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update, delete: if false;
+    }
+
+    match /settings/{id} {
+      allow read: if signedIn();
+      allow write: if hasRole(['admin']) || (signedIn() && !userExists());
+    }
+
+    match /reports/{id} {
+      allow read, write: if canManageCatalogue();
+    }
+
+    match /suspended_sales/{id} {
+      allow read, write: if signedIn();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

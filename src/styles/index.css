@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito:wght@700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Manrope', ui-sans-serif, sans-serif;
+  --font-bubble: 'Nunito', 'Manrope', ui-sans-serif, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --bb-bg: #f7f8fc;
+  --bb-surface: #ffffff;
+  --bb-ink: #0f172a;
+  --bb-muted: #64748b;
+  --bb-border: #e8eaf0;
+  --bb-lime: #84cc16;
+  --bb-teal: #0d9488;
+  --bb-blue: #2563eb;
+  --bb-violet: #7c3aed;
+  --bb-success: #16a34a;
+  --bb-warning: #d97706;
+  --bb-danger: #dc2626;
+  --bb-blend: linear-gradient(135deg, #84cc16 0%, #0d9488 35%, #2563eb 70%, #7c3aed 100%);
+  --bb-blend-soft: linear-gradient(
+    135deg,
+    rgba(132, 204, 22, 0.14) 0%,
+    rgba(13, 148, 136, 0.1) 35%,
+    rgba(37, 99, 235, 0.12) 70%,
+    rgba(124, 58, 237, 0.1) 100%
+  );
+  --bb-shadow: 0 4px 24px rgba(37, 99, 235, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --bb-shadow-lg: 0 12px 40px rgba(37, 99, 235, 0.12), 0 4px 16px rgba(124, 58, 237, 0.08);
+  --font-display: 'Space Grotesk', 'Manrope', ui-sans-serif, sans-serif;
+  --font-bubble: 'Nunito', 'Manrope', ui-sans-serif, sans-serif;
+  --radius-card: 1.25rem;
+  --radius-control: 0.875rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bb-bg);
+  color: var(--bb-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+  color: var(--bb-ink);
+}
+
+.surface {
+  background: var(--bb-surface);
+  border: 1px solid var(--bb-border);
+  box-shadow: var(--bb-shadow);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--bb-shadow);
+}
+
+.glass-strong {
+  background: #ffffff;
+  border: 1px solid var(--bb-border);
+  box-shadow: var(--bb-shadow-lg);
+}
+
+.bb-blend-text {
+  background: var(--bb-blend);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bb-blend-bg {
+  background: var(--bb-blend);
+}
+
+.bb-ambient {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.bb-ambient::before,
+.bb-ambient::after {
+  content: '';
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.45;
+}
+
+.bb-ambient::before {
+  width: 420px;
+  height: 420px;
+  top: -12%;
+  left: -8%;
+  background: var(
+    --bb-ambient-before,
+    radial-gradient(
+      circle,
+      rgba(132, 204, 22, 0.5) 0%,
+      rgba(13, 148, 136, 0.35) 40%,
+      rgba(37, 99, 235, 0.25) 70%,
+      transparent 100%
+    )
+  );
+}
+
+.bb-ambient::after {
+  width: 380px;
+  height: 380px;
+  right: -6%;
+  bottom: -10%;
+  background: var(
+    --bb-ambient-after,
+    radial-gradient(
+      circle,
+      rgba(124, 58, 237, 0.45) 0%,
+      rgba(37, 99, 235, 0.35) 45%,
+      rgba(13, 148, 136, 0.2) 75%,
+      transparent 100%
+    )
+  );
+}
+
+html[data-theme='dark'] .glass {
+  background: rgba(18, 26, 43, 0.88);
+  border-color: rgba(36, 48, 68, 0.9);
+}
+
+html[data-theme='dark'] .glass-strong {
+  background: #121a2b;
+  border-color: var(--bb-border);
+}
+
+html[data-theme='dark'] .bb-blend-bg {
+  color: #0b1220;
+}
+
+.bb-scanner-region video {
+  width: 100% !important;
+  min-height: 280px;
+  object-fit: cover;
+  border-radius: 1.2rem;
+}
+
+.bb-scanner-region img {
+  display: none;
+}
