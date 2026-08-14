@@ -4,8 +4,9 @@ Commercial retail point-of-sale for Best Brightness (South Africa) — cleaning,
 
 ## Live app
 
-- https://best-brightness-pos.web.app
-- https://best-brightness-pos.firebaseapp.com
+- **GitHub Pages:** https://drpaks100.github.io/Smart-POS/
+- **Repo:** https://github.com/DrPaks100/Smart-POS
+- Firebase Hosting (`.web.app`) can be enabled after Firebase CLI re-login / Hosting site setup.
 
 ## Stack
 
