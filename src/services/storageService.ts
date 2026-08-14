@@ -1,3 +1,5 @@
+import { assertSafeProductImage } from '@/utils/contentSafety'
+
 const MAX_EDGE = 420
 const JPEG_QUALITY = 0.7
 const MAX_BYTES = 90_000
@@ -41,6 +43,8 @@ export async function uploadProductImage(input: {
   if (!input.file.type.startsWith('image/')) {
     throw new Error('Only image files are allowed.')
   }
+
+  await assertSafeProductImage(input.file)
 
   let edge = MAX_EDGE
   let quality = JPEG_QUALITY

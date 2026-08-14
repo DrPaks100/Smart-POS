@@ -22,15 +22,17 @@ React · TypeScript · Vite · Firebase (Auth, Firestore) · Tailwind · Zustand
 
 Staff (managers and cashiers) are registered by an administrator under **Staff**.
 
-## Demo logins
+## Staff access
 
-This is a live portfolio demo. Visitors can tap a role on the login page or sign in with:
+Sign in from the home screen with Admin, Manager, or Cashier:
 
 | Role | Email | Password |
 |------|--------|----------|
 | Admin | `admin@bestbrightness.co.za` | `BestBright@Admin2026!` |
 | Manager | `manager@bestbrightness.co.za` | `DemoTill@2026` |
 | Cashier | `cashier@bestbrightness.co.za` | `DemoTill@2026` |
+
+Catalogue safety: product names/notes are screened for explicit wording, and product photos are checked before save.
 
 ## Local development
 
@@ -50,5 +52,5 @@ npx firebase-tools@latest deploy --only hosting,firestore:rules
 ## Notes
 
 - Product photos are stored as compressed data URLs on product documents (no Firebase Storage required).
-- Card payments are a UI simulation for portfolio demos — not live Stripe charges.
+- Card payments use a till-style simulation UI — not live card charging.
 - Currency: ZAR (R). VAT default 15%. Bright Club discount comes from Settings.

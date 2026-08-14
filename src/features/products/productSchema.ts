@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { findBlockedPhrase } from '@/utils/contentSafety'
 
 export const PRODUCT_CATEGORIES = [
   'Cleaning',
@@ -13,9 +14,25 @@ export const PRODUCT_CATEGORIES = [
 
 export const PRODUCT_UNITS = ['each', 'pack', 'box', 'litre', 'kg'] as const
 
+function retailSafeText(label: string) {
+  return z
+    .string()
+    .trim()
+    .superRefine((value, ctx) => {
+      if (!value) return
+      const hit = findBlockedPhrase(value)
+      if (hit) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `${label} must stay retail-safe. That wording is not allowed.`,
+        })
+      }
+    })
+}
+
 export const productFormSchema = z
   .object({
-    name: z.string().trim().min(2, 'Enter a product name.'),
+    name: retailSafeText('Product name').min(2, 'Enter a product name.').max(80, 'Name is too long.'),
     sku: z.string().trim().min(1, 'Enter a SKU.'),
     barcode: z
       .string()
@@ -24,8 +41,8 @@ export const productFormSchema = z
       .max(32, 'Barcode is too long.')
       .regex(/^[0-9A-Za-z\-]+$/, 'Barcode can only contain letters, numbers, and dashes.'),
     category: z.string().trim().min(1, 'Choose a category.'),
-    brand: z.string().trim().optional(),
-    description: z.string().trim().optional(),
+    brand: retailSafeText('Brand').optional(),
+    description: retailSafeText('Notes').max(240, 'Notes are too long.').optional(),
     unit: z.enum(PRODUCT_UNITS),
     costPrice: z.number().min(0, 'Cost cannot be negative.'),
     sellingPrice: z.number().min(0.01, 'Selling price is required.'),

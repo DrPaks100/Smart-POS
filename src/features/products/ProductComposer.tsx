@@ -21,6 +21,7 @@ import { listSuppliers } from '@/services/supplierService'
 import { uploadProductImage } from '@/services/storageService'
 import { useQuery } from '@tanstack/react-query'
 import type { Product } from '@/types'
+import { assertSafeCatalogueText, assertSafeProductImage } from '@/utils/contentSafety'
 import { cn } from '@/utils'
 
 interface ProductComposerProps {
@@ -109,10 +110,15 @@ export function ProductComposer({
   async function onSubmit(values: ProductFormValues) {
     setSaving(true)
     try {
+      assertSafeCatalogueText('Product name', values.name)
+      assertSafeCatalogueText('Brand', values.brand)
+      assertSafeCatalogueText('Notes', values.description)
+
       const productId = product?.id ?? allocateProductId()
       let imageUrl = clearExistingImage ? undefined : product?.imageUrl
 
       if (imageFile) {
+        await assertSafeProductImage(imageFile)
         const uploaded = await uploadProductImage({ file: imageFile })
         imageUrl = uploaded.downloadURL
       } else if (clearExistingImage) {
@@ -170,9 +176,20 @@ export function ProductComposer({
   }
 
   function handleImageChange(file: File | null) {
-    setImageFile(file)
-    if (file === null && product?.imageUrl) setClearExistingImage(true)
-    if (file) setClearExistingImage(false)
+    if (!file) {
+      setImageFile(null)
+      if (product?.imageUrl) setClearExistingImage(true)
+      return
+    }
+    void assertSafeProductImage(file)
+      .then(() => {
+        setImageFile(file)
+        setClearExistingImage(false)
+      })
+      .catch((err) => {
+        setImageFile(null)
+        toast.error((err as Error).message || 'That photo is not allowed.')
+      })
   }
 
   return createPortal(
